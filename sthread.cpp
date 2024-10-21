@@ -26,9 +26,7 @@
     register void *sp asm("sp");                           \
     register void *bp asm("bp");                           \
     cur_tcb->size_ = (int)((long long)bp - (long long)sp); \
-    malloc(cur_tcb->size_);                                \
     cur_tcb->sp_ = sp;                                     \
-    memcpy(cur_tcb->stack_, sp, cur_tcb->size_);           \
   }
 
 #define sthread_yield() \
