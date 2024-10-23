@@ -26,9 +26,12 @@
     register void *sp asm("sp");                           \
     register void *bp asm("bp");                           \
     cur_tcb->size_ = (int)((long long)bp - (long long)sp); \
-    cur_tcb->sp_ = sp;                                     \
     cur_tcb->stack_ = malloc(cur_tcb->size_);              \
-    memcpy(cur_tcb->stack_, sp, cur_tcb->size_);           \
+    if (cur_tcb->stack_ != NULL) {                         \
+      cur_tcb->sp_ = sp;                                   \
+      memcpy(cur_tcb->stack_, sp, cur_tcb->size_);         \
+    }                                                      \
+    longjmp(scheduler_env, 1);                             \
   }
 
 #define sthread_yield()                 \
