@@ -23,21 +23,21 @@
 
 #define capture()                                            \
   {                                                          \
-    if (cur_tcb != NULL && cur_tcb->stack_ != NULL) {         \
+    if (cur_tcb != NULL && cur_tcb->stack_ != NULL) {        \
       memcpy(cur_tcb->stack_, cur_tcb->sp_, cur_tcb->size_); \
     }                                                        \
   }
 
-#define sthread_yield()                  \
-  {                                      \
-    if (alarmed) {                       \
-      alarmed = false;                   \
-      if (setjmp(cur_tcb->env_) == 0) {  \
-        capture();                       \
-        thr_queue.push(cur_tcb); \
-        longjmp(scheduler_env, 1);       \
-      }                                  \
-    }                                    \
+#define sthread_yield()                 \
+  {                                     \
+    if (alarmed) {                      \
+      alarmed = false;                  \
+      if (setjmp(cur_tcb->env_) == 0) { \
+        capture();                      \
+        thr_queue.push(cur_tcb);        \
+        longjmp(scheduler_env, 1);      \
+      }                                 \
+    }                                   \
   }
 
 #define sthread_init()                                     \
