@@ -21,28 +21,23 @@
     }                            \
   }
 
-#define capture()                                          \
-  {                                                        \
-    register void *sp asm("sp");                           \
-    register void *bp asm("bp");                           \
-    cur_tcb->size_ = (int)((long long)bp - (long long)sp); \
-    cur_tcb->stack_ = malloc(cur_tcb->size_);              \
-    if (cur_tcb->stack_ != NULL) {                         \
-      cur_tcb->sp_ = sp;                                   \
-      memcpy(cur_tcb->stack_, sp, cur_tcb->size_);         \
-    }                                                      \
-    longjmp(scheduler_env, 1);                             \
+#define capture()                                            \
+  {                                                          \
+    if (cur_tcb != NULL && cur_tcb->stack_ != NULL) {         \
+      memcpy(cur_tcb->stack_, cur_tcb->sp_, cur_tcb->size_); \
+    }                                                        \
   }
 
-#define sthread_yield()                 \
-  {                                     \
-    if (alarmed) {                      \
-      alarmed = false;                  \
-      if (setjmp(cur_tcb->env_) == 0) { \
-        capture();                      \
-        longjmp(scheduler_env, 1);      \
-      }                                 \
-    }                                   \
+#define sthread_yield()                  \
+  {                                      \
+    if (alarmed) {                       \
+      alarmed = false;                   \
+      if (setjmp(cur_tcb->env_) == 0) {  \
+        capture();                       \
+        thr_queue.push(cur_tcb); \
+        longjmp(scheduler_env, 1);       \
+      }                                  \
+    }                                    \
   }
 
 #define sthread_init()                                     \
