@@ -29,18 +29,19 @@
     cur_tcb->sp_ = sp;                                     \
     cur_tcb->stack_ = malloc(cur_tcb->size_);              \
     memcpy(cur_tcb->stack_, sp, cur_tcb->size_);           \
-    thr_queue.push(cur_tcb); \
+    thr_queue.push(cur_tcb);                               \
   }
 
-#define sthread_yield()                 \
-  {                                     \
-    if (alarmed) {                      \
-      alarmed = false;                  \
-      if (setjmp(cur_tcb->env_) == 0) { \
-        capture();                      \
-        longjmp(scheduler_env, 1);      \
-      }                                 \
-    }                                   \
+#define sthread_yield()                                        \
+  {                                                            \
+    if (alarmed) {                                             \
+      alarmed = false;                                         \
+      if (setjmp(cur_tcb->env_) == 0) {                        \
+        memcpy(cur_tcb->sp_, cur_tcb->stack_, cur_tcb->size_); \
+        capture();                                             \
+        longjmp(scheduler_env, 1);                             \
+      }                                                        \
+    }                                                          \
   }
 
 #define sthread_init()                                     \
